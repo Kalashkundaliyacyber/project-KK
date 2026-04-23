@@ -1,0 +1,39 @@
+scanwise_ai:
+  version: "1.0.0"
+  name: "ScanWise AI"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+
+scanner:
+  timeout_seconds: 300
+  use_simulation_if_no_nmap: true
+
+cve:
+  mode: "local"          # "local" or "nvd_api"
+  nvd_api_key: ""        # optional NVD API key for live lookups
+  local_db_path: "data/cve_db"
+
+files:
+  sessions_dir: "data/sessions"
+  db_path: "data/scanwise.db"
+  max_sessions: 1000
+
+logging:
+  level: "INFO"
+  file: "data/logs/scanwise.log"
+
+safety:
+  allowed_scan_types:
+    - tcp_basic
+    - tcp_syn
+    - udp_scan
+    - service_detect
+    - version_deep
+    - os_detect
+    - port_range
+    - enum_scripts
+  shell_execution: false
+  allow_arbitrary_commands: false

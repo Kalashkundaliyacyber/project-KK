@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ScanWise AI — Security Intelligence</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --border2: #444c56;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --accent: #1f6feb;
+  --accent2: #388bfd;
+  --green: #1d9e75;
+  --red: #e24b4a;
+  --orange: #ef9f27;
+  --blue: #378add;
+  --purple: #7f77dd;
+  --font: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono: 'JetBrains Mono','Fira Code',monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Header */
+.header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; z-index: 10; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--text); }
+.logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.badge { background: #1c3a5e; color: var(--accent2); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.header-stat { font-size: 12px; color: var(--text2); }
+
+/* Main layout */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: 280px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; justify-content: space-between; }
+.history-list { flex: 1; overflow-y: auto; padding: 8px; }
+.history-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; margin-bottom: 4px; transition: all .15s; }
+.history-item:hover { background: var(--bg3); border-color: var(--border); }
+.history-item.active { background: #1c2d40; border-color: var(--accent); }
+.history-target { font-weight: 600; font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.history-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.risk-badge { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 700; text-transform: uppercase; }
+.rb-critical { background: #3d1f1f; color: var(--red); }
+.rb-high { background: #3d2a0f; color: var(--orange); }
+.rb-medium { background: #1a2d3d; color: var(--blue); }
+.rb-low { background: #1a2d25; color: var(--green); }
+.sidebar-empty { padding: 40px 20px; text-align: center; color: var(--text3); font-size: 13px; }
+
+/* Main content area */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Scan controls */
+.scan-controls { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label { font-size: 12px; color: var(--text2); font-weight: 500; white-space: nowrap; }
+input[type=text], select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 13px; font-family: var(--font); outline: none; }
+input[type=text]:focus, select:focus { border-color: var(--accent); }
+input[type=text] { width: 220px; }
+select { width: 200px; cursor: pointer; }
+.btn { padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .15s; font-family: var(--font); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-primary:disabled { background: #1c2d40; color: var(--text3); cursor: not-allowed; }
+.btn-secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); color: var(--text); }
+.btn-green { background: #1a3d2b; color: var(--green); border: 1px solid #2a5a3d; }
+.btn-green:hover { background: #1f4d34; }
+#scan-status { font-size: 12px; color: var(--text2); margin-left: auto; }
+
+/* Content panels */
+.content-area { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
+.left-panel { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
+.right-panel { display: flex; flex-direction: column; overflow: hidden; }
+
+/* Chat */
+.chat-area { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.msg { max-width: 85%; padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; }
+.msg-ai { background: var(--bg3); color: var(--text); border-bottom-left-radius: 3px; align-self: flex-start; border: 1px solid var(--border); }
+.msg-user { background: #1c3a5e; color: var(--text); border-bottom-right-radius: 3px; align-self: flex-end; border: 1px solid #2a5a7e; }
+.msg-system { background: transparent; color: var(--text3); font-size: 12px; align-self: center; border: 1px solid var(--border); border-radius: 6px; }
+.msg b { color: var(--accent2); }
+.typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
+.typing span { width: 6px; height: 6px; background: var(--text3); border-radius: 50%; animation: bounce 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: .2s; }
+.typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+.chat-input-area { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+.chat-input-area input { flex: 1; }
+.quick-btns { padding: 0 16px 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.quick-btn { padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; color: var(--text2); font-size: 11px; cursor: pointer; transition: all .15s; }
+.quick-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+/* Results panel (right) */
+.panel-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; }
+.tab { padding: 10px 14px; font-size: 12px; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap; font-weight: 500; }
+.tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+.tab-content { flex: 1; overflow-y: auto; padding: 14px; display: none; }
+.tab-content.active { display: block; }
+
+/* Risk & CVE cards */
+.section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 10px; }
+.port-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--border2); }
+.port-card.critical { border-left-color: var(--red); }
+.port-card.high { border-left-color: var(--orange); }
+.port-card.medium { border-left-color: var(--blue); }
+.port-card.low { border-left-color: var(--green); }
+.port-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.port-num { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); }
+.svc-name { font-size: 12px; color: var(--text2); }
+.port-version { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.port-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.cve-tag { display: inline-block; background: #3d1f1f; color: #f09595; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin: 2px 2px 2px 0; font-family: var(--mono); cursor: pointer; }
+.cve-tag:hover { background: #5a2a2a; }
+
+.risk-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; margin: 6px 0; }
+.risk-bar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+
+.cve-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.cve-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.cve-id { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent2); }
+.cvss-score { padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700; }
+.cvss-critical { background: #3d1f1f; color: var(--red); }
+.cvss-high { background: #3d2a0f; color: var(--orange); }
+.cvss-medium { background: #1a2d3d; color: var(--blue); }
+.cvss-low { background: #1a2d25; color: var(--green); }
+.cve-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.cve-patch { font-size: 11px; color: var(--green); margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--border); }
+
+.rec-card { background: #1c2d40; border: 1px solid #2a5a7e; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.rec-title { font-weight: 600; color: var(--accent2); font-size: 13px; margin-bottom: 6px; }
+.rec-reason { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.rec-btn-row { margin-top: 10px; }
+
+.guidance-item { font-size: 12px; color: var(--text2); padding: 6px 0; border-bottom: 1px solid var(--border); line-height: 1.5; display: flex; gap: 8px; }
+.guidance-item::before { content: '→'; color: var(--green); flex-shrink: 0; }
+
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.summary-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 10px; text-align: center; }
+.summary-num { font-size: 22px; font-weight: 700; }
+.summary-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.s-critical { color: var(--red); }
+.s-high { color: var(--orange); }
+.s-medium { color: var(--blue); }
+.s-low { color: var(--green); }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+/* Scan progress */
+.scan-progress { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 20px; display: none; align-items: center; gap: 12px; }
+.scan-progress.active { display: flex; }
+.progress-bar-wrap { flex: 1; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--accent); border-radius: 2px; width: 0; transition: width .3s; animation: progress-anim 2s infinite; }
+@keyframes progress-anim { 0%{width:0%} 50%{width:70%} 100%{width:95%} }
+.progress-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    ScanWise AI
+    <span class="badge">v1.0</span>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span class="header-stat" id="header-stat">Ready</span>
+  </div>
+</div>
+
+<div class="app-body">
+  <!-- History Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Scan History
+      <span id="history-count" style="background:var(--bg);padding:1px 6px;border-radius:10px;font-size:11px;">0</span>
+    </div>
+    <div class="history-list" id="history-list">
+      <div class="sidebar-empty">No scans yet.<br>Run your first scan to see history here.</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Scan Controls -->
+    <div class="scan-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">Target</span>
+        <input type="text" id="target-input" placeholder="192.168.1.1 or hostname" value="192.168.1.10"/>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Scan Type</span>
+        <select id="scan-select">
+          <option value="service_detect">Service Detection</option>
+          <option value="tcp_basic">TCP Basic</option>
+          <option value="tcp_syn">TCP SYN (root)</option>
+          <option value="udp_scan">UDP Top-100 (root)</option>
+          <option value="version_deep">Deep Version</option>
+          <option value="os_detect">OS Detection (root)</option>
+          <option value="port_range">Port Range 1-1024</option>
+          <option value="enum_scripts">Script Enumeration</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="scan-btn" onclick="runScan()">▶ Scan</button>
+      <button class="btn btn-secondary" onclick="showRecommendedScan()">💡 Suggest Next</button>
+      <button class="btn btn-green" id="export-btn" onclick="exportReport()" disabled>⬇ Export Report</button>
+      <span id="scan-status"></span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="scan-progress" id="scan-progress">
+      <div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+      <span class="progress-label" id="progress-label">Scanning...</span>
+    </div>
+
+    <div class="content-area">
+      <!-- Left: Chat -->
+      <div class="left-panel">
+        <div class="chat-area" id="chat-area">
+          <div class="msg msg-ai">
+            👋 Welcome to <b>ScanWise AI</b>! I'm your security scanning assistant.<br><br>
+            I can help you scan for open ports, detect services and versions, map CVEs, and prioritize risks — all safely using approved scan templates.<br><br>
+            Enter a target IP or hostname above, choose a scan type, and click <b>Scan</b> to begin. Or ask me anything!
+          </div>
+        </div>
+        <div class="quick-btns">
+          <span class="quick-btn" onclick="quickChat('What scan should I run first?')">What scan first?</span>
+          <span class="quick-btn" onclick="quickChat('Explain CVE mapping')">How does CVE mapping work?</span>
+          <span class="quick-btn" onclick="quickChat('What is risk scoring?')">How is risk scored?</span>
+          <span class="quick-btn" onclick="quickChat('What scan types are available?')">Scan types?</span>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" placeholder="Ask me anything about your scan..." onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="btn btn-primary" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+
+      <!-- Right: Results -->
+      <div class="right-panel">
+        <div class="panel-tabs">
+          <div class="tab active" onclick="switchTab('risk')">Risk</div>
+          <div class="tab" onclick="switchTab('cve')">CVE</div>
+          <div class="tab" onclick="switchTab('findings')">Findings</div>
+          <div class="tab" onclick="switchTab('recommend')">Next Steps</div>
+        </div>
+
+        <!-- Risk Tab -->
+        <div class="tab-content active" id="tab-risk">
+          <div class="empty-state" id="risk-empty">
+            <div class="empty-icon">🛡</div>
+            Run a scan to see risk analysis
+          </div>
+          <div id="risk-content" style="display:none"></div>
+        </div>
+
+        <!-- CVE Tab -->
+        <div class="tab-content" id="tab-cve">
+          <div class="empty-state" id="cve-empty">
+            <div class="empty-icon">🔍</div>
+            CVE data will appear after scanning
+          </div>
+          <div id="cve-content" style="display:none"></div>
+        </div>
+
+        <!-- Findings Tab -->
+        <div class="tab-content" id="tab-findings">
+          <div class="empty-state" id="findings-empty">
+            <div class="empty-icon">📋</div>
+            Scan findings will appear here
+          </div>
+          <div id="findings-content" style="display:none"></div>
+        </div>
+
+        <!-- Recommendations Tab -->
+        <div class="tab-content" id="tab-recommend">
+          <div class="empty-state" id="rec-empty">
+            <div class="empty-icon">💡</div>
+            Recommendations appear after scanning
+          </div>
+          <div id="rec-content" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin + '/api';
+let currentSession = null;
+let lastAnalysis = null;
+
+// ── Chat ──────────────────────────────────────────────────────────────────
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMsg(msg, 'user');
+  const target = document.getElementById('target-input').value.trim();
+
+  const typing = addTyping();
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message: msg, target})
+    });
+    const data = await res.json();
+    typing.remove();
+    addMsg(data.reply, 'ai');
+    if (data.suggestions && data.suggestions.length > 0) {
+      document.getElementById('scan-select').value = data.suggestions[0];
+    }
+  } catch(e) {
+    typing.remove();
+    addMsg('Could not reach the ScanWise AI server. Make sure the backend is running on port 8000.', 'ai');
+  }
+}
+
+function quickChat(msg) {
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+function addMsg(text, type) {
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className = `msg msg-${type}`;
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai typing';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+// ── Scan ──────────────────────────────────────────────────────────────────
+
+async function runScan() {
+  const target = document.getElementById('target-input').value.trim();
+  const scan_type = document.getElementById('scan-select').value;
+  if (!target) { addMsg('Please enter a target IP or hostname.', 'ai'); return; }
+
+  document.getElementById('scan-btn').disabled = true;
+  document.getElementById('scan-progress').classList.add('active');
+  document.getElementById('scan-status').textContent = '';
+  document.getElementById('header-stat').textContent = 'Scanning…';
+
+  const scanLabel = document.getElementById('scan-select').options[document.getElementById('scan-select').selectedIndex].text;
+  addMsg(`Starting **${scanLabel}** on \`${target}\`…`, 'system');
+
+  setProgress(`Running ${scanLabel} on ${target}…`);
+
+  try {
+    const res = await fetch(`${API}/scan`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({target, scan_type, message: ''})
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Scan failed');
+    }
+
+    const data = await res.json();
+    lastAnalysis = data;
+    currentSession = data.session_id;
+
+    document.getElementById('export-btn').disabled = false;
+    document.getElementById('header-stat').textContent = `Last scan: ${target}`;
+
+    renderResults(data);
+    addScanMsg(data);
+    loadHistory();
+
+  } catch(e) {
+    addMsg(`Scan error: ${e.message}`, 'ai');
+    document.getElementById('header-stat').textContent = 'Error';
+  } finally {
+    document.getElementById('scan-btn').disabled = false;
+    document.getElementById('scan-progress').classList.remove('active');
+    document.getElementById('scan-status').textContent = lastAnalysis
+      ? `Done in ${lastAnalysis.duration}s` : '';
+  }
+}
+
+function setProgress(label) {
+  document.getElementById('progress-label').textContent = label;
+}
+
+function addScanMsg(data) {
+  const exp = data.explanation || {};
+  const summary = exp.summary || 'Scan complete.';
+  const rec = data.recommendation || {};
+  let msg = `✅ **Scan complete.**\n\n${summary}`;
+  if (rec.next_scan) {
+    msg += `\n\n💡 **Next recommended scan:** ${rec.next_scan}\n${rec.reason || ''}`;
+  }
+  addMsg(msg, 'ai');
+}
+
+// ── Render results ─────────────────────────────────────────────────────────
+
+function renderResults(data) {
+  const hosts = (data.risk && data.risk.hosts) || [];
+  renderRisk(hosts, data.explanation);
+  renderCVE(hosts);
+  renderFindings(hosts);
+  renderRecommendations(data.recommendation, data.explanation);
+  switchTab('risk');
+}
+
+function renderRisk(hosts, explanation) {
+  document.getElementById('risk-empty').style.display = 'none';
+  const content = document.getElementById('risk-content');
+  content.style.display = 'block';
+
+  let html = '';
+
+  // Summary grid
+  if (hosts.length > 0) {
+    const rs = hosts[0].risk_summary || {};
+    const counts = rs.counts || {};
+    html += `<div class="section-title">Risk Summary</div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="summary-num s-critical">${counts.critical||0}</div><div class="summary-label">Critical</div></div>
+      <div class="summary-card"><div class="summary-num s-high">${counts.high||0}</div><div class="summary-label">High</div></div>
+      <div class="summary-card"><div class="summary-num s-medium">${counts.medium||0}</div><div class="summary-label">Medium</div></div>
+      <div class="summary-card"><div class="summary-num s-low">${counts.low||0}</div><div class="summary-label">Low</div></div>
+    </div>`;
+  }
+
+  // Per-port risk cards
+  html += `<div class="section-title" style="margin-top:12px">Port Risk Details</div>`;
+  for (const host of hosts) {
+    for (const port of (host.ports||[])) {
+      const risk = port.risk || {};
+      const va = port.version_analysis || {};
+      const level = risk.level || 'low';
+      const score = risk.score || 0;
+      const pct = (score / 10) * 100;
+      const colors = {critical:'#e24b4a',high:'#ef9f27',medium:'#378add',low:'#1d9e75'};
+      const color = colors[level] || '#888';
+      html += `<div class="port-card ${level}">
+        <div class="port-header">
+          <span class="port-num">${port.port}/${port.protocol||'tcp'}</span>
+          <span class="svc-name">${port.service||'unknown'}</span>
+          <span class="risk-badge rb-${level}">${level}</span>
+        </div>
+        <div class="port-version">${port.product||''} ${port.version||''}</div>
+        <div class="risk-bar"><div class="risk-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px">
+          <span>Risk score</span><span style="color:${color};font-weight:700">${score}/10</span>
+        </div>
+        <div class="port-body">${(risk.reasons||[]).map(r=>`• ${r}`).join('<br>')}</div>
+      </div>`;
+    }
+  }
+
+  content.innerHTML = html;
+}
+
+function renderCVE(hosts) {
+  document.getElementById('cve-empty').style.display = 'none';
+  const content = document.getElementById('cve-content');
+  content.style.display = 'block';
+
+  let allCVEs = [];
+  for (const host of hosts) {
+    for (const port of (host.ports||[])) {
+      for (const cve of (port.cves||[])) {
+        allCVEs.push({...cve, port: port.port, service: port.service});
+      }
+    }
+  }
+
+  allCVEs.sort((a,b) => b.cvss_score - a.cvss_score);
+
+  if (allCVEs.length === 0) {
+    document.getElementById('cve-content').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">✅</div>No CVEs matched in this scan.</div>';
+    return;
+  }
+
+  const sevClass = {critical:'cvss-critical',high:'cvss-high',medium:'cvss-medium',low:'cvss-low'};
+  let html = `<div class="section-title">${allCVEs.length} CVE(s) Found</div>`;
+  for (const cve of allCVEs) {
+    html += `<div class="cve-card">
+      <div class="cve-header">
+        <span class="cve-id">${cve.cve_id}</span>
+        <span class="cvss-score ${sevClass[cve.severity]||'cvss-low'}">CVSS ${cve.cvss_score}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:auto">Port ${cve.port} · ${cve.service}</span>
+      </div>
+      <div class="cve-desc">${cve.description}</div>
+      ${cve.patch ? `<div class="cve-patch">🔧 ${cve.patch}</div>` : ''}
+    </div>`;
+  }
+  content.innerHTML = html;
+}
+
+function renderFindings(hosts) {
+  document.getElementById('findings-empty').style.display = 'none';
+  const content = document.getElementById('findings-content');
+  content.style.display = 'block';
+
+  let html = '';
+  for (const host of hosts) {
+    const os = host.os ? `<span style="color:var(--text3);font-size:11px"> · ${host.os.name} (${host.os.accuracy}%)</span>` : '';
+    html += `<div class="section-title">Host: ${host.ip}${os}</div>`;
+
+    for (const port of (host.ports||[])) {
+      const va = port.version_analysis || {};
+      const vs_colors = {latest:'var(--green)',outdated:'var(--orange)',unsupported:'var(--red)',unknown:'var(--text3)'};
+      const vs_color = vs_colors[va.status] || 'var(--text3)';
+      const cveCount = (port.cves||[]).length;
+      html += `<div class="port-card ${port.risk?.level||'low'}">
+        <div class="port-header">
+          <span class="port-num">${port.port}/${port.protocol}</span>
+          <span class="svc-name">${port.service}</span>
+          <span class="risk-badge rb-${port.risk?.level||'low'}">${port.risk?.level||'low'}</span>
+        </div>
+        <div class="port-version" style="color:${vs_color}">${port.product||''} ${port.version||''} 
+          ${va.status ? `· ${va.status}` : ''}</div>
+        <div class="port-body" style="margin-top:6px">${va.message||''}</div>
+        ${cveCount > 0 ? `<div style="margin-top:6px">${(port.cves||[]).map(c=>`<span class="cve-tag">${c.cve_id}</span>`).join('')}</div>` : ''}
+      </div>`;
+    }
+  }
+  content.innerHTML = html;
+}
+
+function renderRecommendations(rec, explanation) {
+  document.getElementById('rec-empty').style.display = 'none';
+  const content = document.getElementById('rec-content');
+  content.style.display = 'block';
+
+  let html = '';
+
+  if (rec && rec.title) {
+    html += `<div class="section-title">Recommended Next Scan</div>
+    <div class="rec-card">
+      <div class="rec-title">💡 ${rec.title}</div>
+      <div class="rec-reason">${rec.reason}</div>
+      ${rec.scan_type ? `<div class="rec-btn-row">
+        <button class="btn btn-primary" style="font-size:12px;padding:5px 12px" onclick="applySuggestedScan('${rec.scan_type}')">
+          Use This Scan ↗
+        </button>
+      </div>` : ''}
+    </div>`;
+
+    if (rec.alternatives && rec.alternatives.length > 0) {
+      html += `<div class="section-title">Other Options</div>`;
+      for (const alt of rec.alternatives) {
+        html += `<div class="rec-card" style="background:var(--bg3);border-color:var(--border)">
+          <div class="rec-title" style="color:var(--text2)">${alt.title}</div>
+          <div class="rec-reason">${alt.reason}</div>
+          ${alt.scan_type ? `<div class="rec-btn-row">
+            <button class="btn btn-secondary" style="font-size:12px;padding:5px 12px" onclick="applySuggestedScan('${alt.scan_type}')">Use ↗</button>
+          </div>` : ''}
+        </div>`;
+      }
+    }
+  }
+
+  if (explanation && explanation.defensive_guidance && explanation.defensive_guidance.length > 0) {
+    html += `<div class="section-title" style="margin-top:14px">Defensive Guidance</div>`;
+    for (const g of explanation.defensive_guidance) {
+      html += `<div class="guidance-item">${g}</div>`;
+    }
+  }
+
+  content.innerHTML = html;
+}
+
+// ── History ────────────────────────────────────────────────────────────────
+
+async function loadHistory() {
+  try {
+    const res = await fetch(`${API}/history`);
+    const data = await res.json();
+    const sessions = data.sessions || [];
+    document.getElementById('history-count').textContent = sessions.length;
+    const list = document.getElementById('history-list');
+
+    if (sessions.length === 0) {
+      list.innerHTML = '<div class="sidebar-empty">No scans yet.</div>';
+      return;
+    }
+
+    list.innerHTML = sessions.map(s => `
+      <div class="history-item ${s.session_id === currentSession ? 'active' : ''}"
+           onclick="loadSession('${s.session_id}')">
+        <div class="history-target">
+          ${s.target}
+          <span class="risk-badge rb-${s.overall_risk||'low'}">${s.overall_risk||'low'}</span>
+        </div>
+        <div class="history-meta">${s.scan_type} · ${s.open_ports||0} ports · ${s.cve_count||0} CVEs</div>
+        <div class="history-meta">${s.timestamp}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.log('History load failed (server may not be running)');
+  }
+}
+
+async function loadSession(sessionId) {
+  try {
+    const res = await fetch(`${API}/session/${sessionId}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    lastAnalysis = data;
+    currentSession = sessionId;
+    document.getElementById('export-btn').disabled = false;
+    renderResults(data);
+    addMsg(`Loaded session for **${data.target}** (${data.scan_type}).`, 'system');
+  } catch(e) {
+    addMsg('Could not load session.', 'ai');
+  }
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['risk','cve','findings','recommend'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+function applySuggestedScan(scanType) {
+  document.getElementById('scan-select').value = scanType;
+  addMsg(`Scan type set to **${scanType}**. Click Scan to run it.`, 'system');
+}
+
+function showRecommendedScan() {
+  if (lastAnalysis && lastAnalysis.recommendation) {
+    const rec = lastAnalysis.recommendation;
+    addMsg(`💡 **Recommended:** ${rec.title}\n${rec.reason}`, 'ai');
+    switchTab('recommend');
+  } else {
+    addMsg('Run a scan first to get personalised recommendations.', 'ai');
+  }
+}
+
+async function exportReport() {
+  if (!currentSession) return;
+  try {
+    const res = await fetch(`${API}/report`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({session_id: currentSession})
+    });
+    if (!res.ok) throw new Error('Report generation failed');
+    const data = await res.json();
+    window.location.href = `${API}/report/download/${currentSession}`;
+    addMsg('📄 Report generated and downloading. Check your downloads folder.', 'ai');
+  } catch(e) {
+    addMsg(`Report error: ${e.message}`, 'ai');
+  }
+}
+
+// Init
+loadHistory();
+</script>
+</body>
+</html>
