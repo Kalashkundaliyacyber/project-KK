@@ -1,42 +1,111 @@
 # ScanWise AI 🛡️
 
-**Context-Aware, Explainable Vulnerability Intelligence System**
-
-An M.Tech research project that combines network scanning, CVE mapping, risk prioritization, and plain-English explanation into a safe, local, chatbot-driven web application.
+**Context-Aware, Explainable Vulnerability Intelligence System**  
+M.Tech Research Project — Cybersecurity
 
 ---
 
-## Quick Start
+## Python Dependencies
+
+The project uses **only 5 lightweight pip packages**. Everything else (XML parsing, SQLite, JSON, subprocess) uses Python's built-in standard library.
+
+| Package | Version | Purpose |
+|---|---|---|
+| `fastapi` | 0.111.0 | REST API framework |
+| `uvicorn[standard]` | 0.29.0 | ASGI web server (runs FastAPI) |
+| `pydantic` | 2.7.1 | Request/response data validation |
+| `python-multipart` | 0.0.9 | File upload support |
+| `jinja2` | 3.1.4 | Report template rendering |
+
+---
+
+## Quick Start — Kali Linux / Debian / Ubuntu
+
+### Step 1 — One-time system packages
 
 ```bash
-# Clone or extract the project
-cd scanwise-ai
-
-# Start everything (auto-installs dependencies)
-bash run.sh
-
-# Open browser
-# http://localhost:8000
+sudo apt update
+sudo apt install python3 python3-venv nmap -y
 ```
 
-> **No nmap?** The system automatically uses realistic simulated scan output so you can demo and test all features without installing nmap or running as root.
+### Step 2 — Run
+
+```bash
+cd scanwise-ai
+bash run.sh
+```
+
+This automatically:
+1. Creates a `.venv/` Python virtual environment inside the project folder
+2. Installs all 5 pip packages **inside `.venv/`** — no system Python touched
+3. Starts the server at `http://localhost:8000`
+
+> **Why venv?** Kali Linux (and modern Debian/Ubuntu) block system-wide pip installs
+> under PEP 668 to protect the OS Python. Using a venv is the correct Kali way.
+> `run.sh` handles all of this automatically.
+
+### Step 3 — Open in browser
+
+```
+http://localhost:8000
+```
 
 ---
 
-## Features
+## Manual Setup (if run.sh fails for any reason)
 
-| Feature | Description |
-|---|---|
-| 💬 Chatbot UI | Ask questions, get guided scan suggestions |
-| 🔍 8 Scan Templates | TCP, UDP, SYN, Service, Version, OS, Scripts, Range |
-| 📦 Output Parser | Nmap XML → structured JSON automatically |
-| 🔬 Version Engine | Detects latest / outdated / unsupported status |
-| 🗂️ CVE Mapping | 18+ real CVEs mapped to services and versions |
-| ⚖️ Risk Scoring | Weighted formula: CVSS + exposure + criticality |
-| 💡 Recommendations | Suggests next safe scan with reasoning |
-| 📝 Explanation Layer | Plain-English findings, why it matters, what to do |
-| 📁 Session History | SQLite-indexed scan history, searchable |
-| 📄 Report Export | Downloadable JSON report with full analysis |
+```bash
+cd scanwise-ai
+
+# 1. Create virtual environment
+python3 -m venv .venv
+
+# 2. Activate it
+source .venv/bin/activate
+
+# 3. Install the 5 dependencies
+pip install fastapi==0.111.0 "uvicorn[standard]==0.29.0" \
+            pydantic==2.7.1 python-multipart==0.0.9 jinja2==3.1.4
+
+# 4. Create data directories
+mkdir -p data/sessions data/cve_db data/logs reports exports
+
+# 5. Start the server
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+---
+
+## Simulation Mode (no nmap / no root needed)
+
+If nmap is not installed, the system automatically returns **realistic simulated
+scan output** covering OpenSSH, Apache, MySQL, vsftpd, BIND, and SNMP — so all
+CVE mapping, risk scoring, recommendation, and explanation features work in full
+for demos and development.
+
+Install nmap for real scanning:
+```bash
+sudo apt install nmap       # basic scans (no root needed for -sT)
+sudo nmap ...               # root needed for: tcp_syn, udp_scan, os_detect
+```
+
+---
+
+## Running Tests
+
+```bash
+source .venv/bin/activate          # activate venv first
+
+# Run all 209 unit tests
+python3 tests/run_tests.py
+
+# Run the 5-fixture CVE benchmark
+python3 tests/benchmark.py
+
+# Or use the run.sh shortcuts (activates venv automatically)
+bash run.sh --test
+bash run.sh --benchmark
+```
 
 ---
 
@@ -45,45 +114,45 @@ bash run.sh
 ```
 scanwise-ai/
 ├── app/
-│   ├── main.py                  ← FastAPI app entry point
+│   ├── main.py                  ← FastAPI entry point
 │   ├── api/
-│   │   ├── routes.py            ← All API endpoints
-│   │   └── validators.py        ← Input sanitization
+│   │   ├── routes.py            ← /scan /chat /history /report endpoints
+│   │   └── validators.py        ← Target + scan type sanitization
 │   ├── scanner/
-│   │   ├── orchestrator.py      ← 8 safe scan templates
-│   │   └── executor.py          ← subprocess runner + simulation
+│   │   ├── orchestrator.py      ← 8 safe scan templates (whitelist only)
+│   │   └── executor.py          ← subprocess runner + simulation fallback
 │   ├── parser/
-│   │   └── nmap_parser.py       ← XML → JSON parser
+│   │   └── nmap_parser.py       ← Nmap XML → structured JSON
 │   ├── analysis/
-│   │   ├── version_engine.py    ← Version status classification
-│   │   ├── context_engine.py    ← Exposure + criticality
-│   │   └── risk_engine.py       ← Weighted risk scoring
+│   │   ├── version_engine.py    ← latest / outdated / unsupported
+│   │   ├── context_engine.py    ← exposure + service criticality
+│   │   └── risk_engine.py       ← weighted score → Low/Med/High/Critical
 │   ├── cve/
-│   │   └── mapper.py            ← CVE database + mapping
+│   │   └── mapper.py            ← 18+ real CVEs, local DB, no exploits
 │   ├── recommendation/
-│   │   └── recommender.py       ← Next scan suggestions
+│   │   └── recommender.py       ← next safe scan suggestion
 │   ├── explanation/
-│   │   └── explainer.py         ← Human-readable output
+│   │   └── explainer.py         ← plain-English findings + guidance
 │   ├── files/
-│   │   └── session_manager.py   ← SQLite + folder storage
+│   │   └── session_manager.py   ← SQLite index + per-session folders
 │   └── report/
-│       └── template_builder.py  ← Report JSON generator
+│       └── template_builder.py  ← JSON report generator
 ├── static/
-│   └── index.html               ← Full web UI
+│   └── index.html               ← Full dark-themed chatbot web UI
 ├── data/
-│   ├── sessions/                ← Per-scan session folders
-│   ├── cve_db/                  ← Local CVE database
-│   └── scanwise.db              ← SQLite history index
+│   ├── sessions/                ← Per-scan session folders (auto-created)
+│   └── scanwise.db              ← SQLite history index (auto-created)
 ├── tests/
-│   ├── test_parser.py           ← Parser unit tests
-│   ├── test_cve_mapper.py       ← CVE mapper unit tests
-│   ├── test_engines.py          ← Version + risk engine tests
-│   ├── test_recommendation.py   ← Recommender + explainer tests
-│   └── benchmark.py             ← 5-fixture evaluation suite
+│   ├── run_tests.py             ← Standalone test runner (no pytest needed)
+│   ├── benchmark.py             ← 5-fixture ground-truth evaluation
+│   ├── test_parser.py           ← pytest-compatible parser tests
+│   ├── test_cve_mapper.py       ← pytest-compatible CVE tests
+│   ├── test_engines.py          ← pytest-compatible engine tests
+│   └── test_recommendation.py  ← pytest-compatible rec + explain tests
 ├── config/
-│   └── settings.yaml
-├── requirements.txt
-└── run.sh
+│   └── settings.yaml            ← App configuration
+├── requirements.txt             ← 5 pip packages
+└── run.sh                       ← Startup script (handles venv + server)
 ```
 
 ---
@@ -92,19 +161,19 @@ scanwise-ai/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/chat` | Chatbot NLP response |
-| POST | `/api/scan` | Run a scan and get full analysis |
-| GET | `/api/history` | List all past sessions |
-| GET | `/api/session/{id}` | Fetch a specific session |
-| GET | `/api/templates` | List available scan types |
-| POST | `/api/report` | Generate report for a session |
-| GET | `/api/report/download/{id}` | Download report JSON |
+| `POST` | `/api/chat` | Chatbot — NLP scan guidance |
+| `POST` | `/api/scan` | Run scan + full analysis pipeline |
+| `GET`  | `/api/history` | List all past scan sessions |
+| `GET`  | `/api/session/{id}` | Fetch a specific session's analysis |
+| `GET`  | `/api/templates` | List available scan types |
+| `POST` | `/api/report` | Generate report for a session |
+| `GET`  | `/api/report/download/{id}` | Download report as JSON |
 
 ---
 
-## Scan Types
+## Approved Scan Templates
 
-| Template | Command Used | Requires Root |
+| Name | Command (simplified) | Root? |
 |---|---|---|
 | `tcp_basic` | `nmap -sT -T3 --open` | No |
 | `tcp_syn` | `nmap -sS -T3 --open` | Yes |
@@ -115,75 +184,16 @@ scanwise-ai/
 | `port_range` | `nmap -p 1-1024` | No |
 | `enum_scripts` | `nmap -sC -sV` | No |
 
----
-
-## Running Tests
-
-```bash
-# All unit tests
-python -m pytest tests/ -v
-
-# Specific test file
-python -m pytest tests/test_parser.py -v
-
-# Benchmark evaluation (5 ground-truth fixtures)
-python tests/benchmark.py
-
-# Or via run.sh
-bash run.sh --test
-bash run.sh --benchmark
-```
+All commands use `shell=False` — no shell injection possible.
 
 ---
 
-## Architecture Layers
-
-```
-User (Browser)
-    ↓ HTTP
-FastAPI Backend (routes.py)
-    ↓ validated input
-Command Orchestrator (8 safe templates only)
-    ↓ subprocess (shell=False)
-Linux Scanner (nmap) / Simulation
-    ↓ XML stdout
-Output Parser → structured JSON
-    ↓
-Version Detection Engine
-    ↓
-CVE Mapping Engine (local DB, 18+ CVEs)
-    ↓
-Context Engine (exposure + criticality)
-    ↓
-Risk Prioritization (score 0–10 → low/medium/high/critical)
-    ↓
-Recommendation Engine (next safe scan)
-    ↓
-Explanation Layer (plain English)
-    ↓
-File Manager (SQLite + session folders)
-    ↓ JSON API response
-Web UI (Chat + Risk + CVE + Findings + Recommendations)
-```
-
----
-
-## Safety Design
-
-- **No shell=True** anywhere in the codebase
-- **Whitelist-only** command templates — no arbitrary execution
-- **Input validation** on all targets (IP/CIDR/hostname regex)
-- **CVE descriptions only** — no exploit steps, no PoC links
-- **Explanation layer** is purely defensive guidance
-
----
-
-## CVEs Covered (Local Database)
+## CVEs in Local Database
 
 | Service | CVEs |
 |---|---|
 | OpenSSH | CVE-2023-38408, CVE-2023-28531, CVE-2018-15473, CVE-2016-6515, CVE-2016-0777 |
-| Apache HTTP | CVE-2021-41773, CVE-2021-42013, CVE-2017-7679, CVE-2022-31813 |
+| Apache httpd | CVE-2021-41773, CVE-2021-42013, CVE-2017-7679, CVE-2022-31813 |
 | vsftpd | CVE-2011-2523 (backdoor), CVE-2021-3618 |
 | MySQL | CVE-2016-6662, CVE-2012-2122, CVE-2023-21980 |
 | ISC BIND | CVE-2021-25220, CVE-2022-2795 |
@@ -191,25 +201,28 @@ Web UI (Chat + Risk + CVE + Findings + Recommendations)
 
 ---
 
-## Future Enhancements
+## Safety Design
 
-1. **NVD API integration** — live CVE lookups via `api.nvd.nist.gov`
-2. **PDF report generation** — via WeasyPrint or ReportLab
-3. **LLM-enhanced explanations** — Ollama + Mistral 7B for narrative
-4. **MITRE ATT&CK mapping** — link findings to attacker techniques
-5. **Multi-host scanning** — subnet CIDR support with host correlation
-6. **Delta reports** — compare scan sessions over time
-7. **CVSS v4.0** — updated severity framework
+- `shell=False` everywhere — no shell injection possible
+- Whitelist-only command templates — no arbitrary execution
+- Input validation on all targets (regex: IPv4 / CIDR / hostname)
+- CVE descriptions only — no exploit steps, no PoC links
+- Explanation layer is purely defensive guidance
+
+---
+
+## Test Results
+
+```
+Unit tests  : 209 / 209 passed  (100%) ✦
+Benchmark   :   5 /   5 passed  (100%) ✦
+```
 
 ---
 
 ## Research Title
 
-**ScanWise AI: A Context-Aware, Explainable Vulnerability Intelligence System for Safe and Automated Network Security Assessment**
+**ScanWise AI: A Context-Aware, Explainable Vulnerability Intelligence System
+for Safe and Automated Network Security Assessment**
 
----
-
-## Author
-
-M.Tech Research Project — Cybersecurity  
-ScanWise AI v1.0
+M.Tech Cybersecurity Project — v1.0
