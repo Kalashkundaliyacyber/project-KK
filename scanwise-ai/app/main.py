@@ -1,35 +1,45 @@
-"""ScanWise AI — Main FastAPI Application"""
-import sys
-from pathlib import Path
+"""ScanWise AI — FastAPI Application Entry Point"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import uvicorn
+import os
 
 from app.api.routes import router
-from app.files.session_manager import SessionManager
 
-app = FastAPI(title="ScanWise AI", version="1.0.0")
+app = FastAPI(
+    title="ScanWise AI",
+    description="Context-Aware Explainable Vulnerability Intelligence System",
+    version="1.0.0"
+)
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"],
-    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-
-static_path = Path(__file__).parent.parent / "static"
-if static_path.exists():
-    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(router, prefix="/api")
 
+# Serve static files (the web UI)
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 @app.get("/")
-async def root():
-    index_path = Path(__file__).parent.parent / "static" / "index.html"
-    if index_path.exists():
-        return FileResponse(str(index_path))
-    return {"message": "ScanWise AI API running", "docs": "/docs"}
+async def serve_ui():
+    index = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "index.html")
+    return FileResponse(index)
 
 @app.on_event("startup")
 async def startup_event():
-    SessionManager.initialize_directories()
-    print("ScanWise AI started — http://localhost:8000")
+    # Ensure data directories exist at startup
+    base = os.path.dirname(os.path.dirname(__file__))
+    for d in ["data/sessions", "data/cve_db", "data/version_db", "data/logs", "reports", "exports"]:
+        os.makedirs(os.path.join(base, d), exist_ok=True)
+
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

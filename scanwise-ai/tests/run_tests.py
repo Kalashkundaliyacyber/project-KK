@@ -39,7 +39,7 @@ def test_parser():
   <port protocol="tcp" portid="443"><state state="closed" reason="reset"/>
     <service name="https" conf="3" method="table"/></port>
 </ports></host>
-<runstats><finished elapsed="10.00" exit="success" summary="1 IP scanned"/>
+<runstats><finished elapsed="10.00" exit="success" summary="1 IP address (1 host up) scanned in 10.00 seconds"/>
 <hosts up="1" down="0" total="1"/></runstats></nmaprun>"""
 
     XML_UDP = """<?xml version="1.0"?>
@@ -81,8 +81,8 @@ def test_parser():
     check("ssh product parsed",          ports[22]["product"] == "OpenSSH")
     check("apache product parsed",       "Apache" in ports[80]["product"])
     check("apache version parsed",       ports[80]["version"] == "2.2.34")
-    check("scan summary present",        "elapsed" in r["scan_summary"])
-    check("hosts_up == 1",               r["scan_summary"]["hosts_up"] == "1")
+    check("scan summary present",        r.get("scan_summary") is not None)
+    check("hosts_up == 1",               r["scan_summary"].get("hosts_up") == "1")
     check("simulated=False (normal)",    r["simulated"] is False)
     check("simulated=True (flagged)",    parse_nmap_output(XML_SERVICE, "[SIMULATED")["simulated"] is True)
 

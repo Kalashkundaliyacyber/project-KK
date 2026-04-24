@@ -1,16 +1,14 @@
-"""
-Nmap Output Parser
-Converts nmap XML output (-oX) to structured JSON.
-"""
+"""Nmap XML Output Parser — converts nmap -oX output to structured JSON."""
 import xml.etree.ElementTree as ET
 from typing import Optional
 
+
 def parse_nmap_output(xml_output: str, raw_output: str = "") -> dict:
     result = {
-        "hosts": [],
+        "hosts":        [],
         "scan_summary": {},
-        "raw_length": len(raw_output),
-        "simulated": "[SIMULATED" in raw_output
+        "raw_length":   len(raw_output),
+        "simulated":    "[SIMULATED" in raw_output,
     }
     try:
         root = ET.fromstring(xml_output.strip())
@@ -20,18 +18,19 @@ def parse_nmap_output(xml_output: str, raw_output: str = "") -> dict:
 
     run_stats = root.find("runstats")
     if run_stats is not None:
-        finished = run_stats.find("finished")
+        fin        = run_stats.find("finished")
         hosts_elem = run_stats.find("hosts")
-        if finished is not None:
-            result["scan_summary"]["elapsed"] = finished.get("elapsed", "?")
-            result["scan_summary"]["summary"] = finished.get("summary", "")
+        # Use "is not None" — Python 3.13 deprecated truthiness test on XML elements
+        if fin is not None:
+            result["scan_summary"]["elapsed"] = fin.get("elapsed", "?")
+            result["scan_summary"]["summary"] = fin.get("summary", "")
         if hosts_elem is not None:
-            result["scan_summary"]["hosts_up"] = hosts_elem.get("up", "0")
+            result["scan_summary"]["hosts_up"]    = hosts_elem.get("up", "0")
             result["scan_summary"]["hosts_total"] = hosts_elem.get("total", "0")
 
     for host_elem in root.findall("host"):
         host = _parse_host(host_elem)
-        if host:
+        if host is not None:
             result["hosts"].append(host)
 
     return result
@@ -48,30 +47,30 @@ def _parse_host(host_elem) -> Optional[dict]:
         if addr.get("addrtype") == "ipv4":
             host["ip"] = addr.get("addr", "")
         elif addr.get("addrtype") == "mac":
-            host["mac"] = addr.get("addr", "")
+            host["mac"]    = addr.get("addr", "")
             host["vendor"] = addr.get("vendor", "")
 
-    hostnames_elem = host_elem.find("hostnames")
-    if hostnames_elem:
-        for hn in hostnames_elem.findall("hostname"):
+    hn_elem = host_elem.find("hostnames")
+    if hn_elem is not None:
+        for hn in hn_elem.findall("hostname"):
             host["hostnames"].append(hn.get("name", ""))
 
     os_elem = host_elem.find("os")
-    if os_elem:
+    if os_elem is not None:
         matches = os_elem.findall("osmatch")
         if matches:
             best = matches[0]
             host["os"] = {
-                "name": best.get("name", "Unknown"),
+                "name":     best.get("name", "Unknown"),
                 "accuracy": best.get("accuracy", "0"),
             }
 
     ports_elem = host_elem.find("ports")
-    if ports_elem:
-        for port_elem in ports_elem.findall("port"):
-            port = _parse_port(port_elem)
-            if port:
-                host["ports"].append(port)
+    if ports_elem is not None:
+        for pe in ports_elem.findall("port"):
+            p = _parse_port(pe)
+            if p is not None:
+                host["ports"].append(p)
 
     return host
 
@@ -85,29 +84,29 @@ def _parse_port(port_elem) -> Optional[dict]:
         return None
 
     port = {
-        "port": int(port_elem.get("portid", 0)),
-        "protocol": port_elem.get("protocol", "tcp"),
-        "state": state,
-        "service": "",
-        "product": "",
-        "version": "",
+        "port":       int(port_elem.get("portid", 0)),
+        "protocol":   port_elem.get("protocol", "tcp"),
+        "state":      state,
+        "service":    "",
+        "product":    "",
+        "version":    "",
         "extra_info": "",
         "confidence": 0,
-        "method": ""
+        "method":     "",
     }
 
-    service_elem = port_elem.find("service")
-    if service_elem is not None:
-        port["service"] = service_elem.get("name", "")
-        port["product"] = service_elem.get("product", "")
-        port["version"] = service_elem.get("version", "")
-        port["extra_info"] = service_elem.get("extrainfo", "")
-        port["confidence"] = int(service_elem.get("conf", 0))
-        port["method"] = service_elem.get("method", "")
+    svc = port_elem.find("service")
+    if svc is not None:
+        port["service"]    = svc.get("name", "")
+        port["product"]    = svc.get("product", "")
+        port["version"]    = svc.get("version", "")
+        port["extra_info"] = svc.get("extrainfo", "")
+        port["confidence"] = int(svc.get("conf", 0))
+        port["method"]     = svc.get("method", "")
 
     scripts = []
-    for script in port_elem.findall("script"):
-        scripts.append({"id": script.get("id", ""), "output": script.get("output", "")})
+    for sc in port_elem.findall("script"):
+        scripts.append({"id": sc.get("id", ""), "output": sc.get("output", "")})
     if scripts:
         port["scripts"] = scripts
 

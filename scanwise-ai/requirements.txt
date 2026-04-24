@@ -1,22 +1,17 @@
-# ScanWise AI — Python 3.13 compatible (Kali Linux)
-# All pure-Python packages — NO Rust compilation, NO C extensions to build
+# ScanWise AI — Python 3.13 compatible (Kali Linux / Ubuntu / Debian)
+# ALL pure-Python packages — zero Rust, zero C compilation required
 # Tested on Python 3.10, 3.11, 3.12, 3.13
 
 anyio==3.7.1
 click==8.1.7
 h11==0.14.0
-httptools==0.6.1
 idna==3.7
 jinja2==3.1.4
 MarkupSafe==2.1.5
 pydantic==1.10.21
-python-dotenv==1.0.1
 python-multipart==0.0.9
-PyYAML==6.0.2
 sniffio==1.3.1
 starlette==0.27.0
 typing_extensions==4.12.2
 uvicorn==0.24.0
-watchfiles==0.21.0
-websockets==12.0
 fastapi==0.104.1
