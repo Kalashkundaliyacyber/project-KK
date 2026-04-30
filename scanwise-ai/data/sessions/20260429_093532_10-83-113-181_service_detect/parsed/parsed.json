@@ -1,0 +1,32 @@
+{
+  "hosts": [
+    {
+      "ip": "10.83.113.181",
+      "hostnames": [],
+      "os": null,
+      "ports": [
+        {
+          "port": 53,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "domain",
+          "product": "dnsmasq",
+          "version": "2.51",
+          "extra_info": "",
+          "confidence": 10,
+          "method": "probed"
+        }
+      ],
+      "mac": "DE:EA:78:22:77:61",
+      "vendor": ""
+    }
+  ],
+  "scan_summary": {
+    "elapsed": "6.88",
+    "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+    "hosts_up": "1",
+    "hosts_total": "1"
+  },
+  "raw_length": 9294,
+  "simulated": false
+}

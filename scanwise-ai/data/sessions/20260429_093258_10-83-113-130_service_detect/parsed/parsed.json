@@ -1,0 +1,11 @@
+{
+  "hosts": [],
+  "scan_summary": {
+    "elapsed": "21.84",
+    "summary": "Nmap done at Wed Apr 29 09:33:19 2026; 1 IP address (1 host up) scanned in 21.84 seconds",
+    "hosts_up": "1",
+    "hosts_total": "1"
+  },
+  "raw_length": 4867,
+  "simulated": false
+}

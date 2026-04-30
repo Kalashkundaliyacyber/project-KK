@@ -1,0 +1,585 @@
+{
+  "session_id": "20260429_093532_10-83-113-181_service_detect",
+  "target": "10.83.113.181",
+  "scan_type": "service_detect",
+  "duration": 6.93,
+  "parsed": {
+    "hosts": [
+      {
+        "ip": "10.83.113.181",
+        "hostnames": [],
+        "os": null,
+        "ports": [
+          {
+            "port": 53,
+            "protocol": "tcp",
+            "state": "open",
+            "service": "domain",
+            "product": "dnsmasq",
+            "version": "2.51",
+            "extra_info": "",
+            "confidence": 10,
+            "method": "probed",
+            "version_analysis": {
+              "status": "outdated",
+              "version_string": "dnsmasq 2.51",
+              "confidence": "medium",
+              "message": "dnsmasq 2.51 is not in the version database. Treat as potentially outdated.",
+              "age_years": null
+            },
+            "cves": [],
+            "context": {
+              "criticality": "high",
+              "criticality_reason": "DNS \u2014 can be abused for amplification or poisoning",
+              "exposure_type": "commonly_exposed",
+              "version_risk": "medium",
+              "total_open_ports": 1
+            },
+            "risk": {
+              "score": 3.0,
+              "level": "low",
+              "max_cvss": 0.0,
+              "cve_count": 0,
+              "reasons": [
+                "Service criticality is high",
+                "Version is outdated"
+              ],
+              "color": "#1D9E75"
+            }
+          }
+        ],
+        "mac": "DE:EA:78:22:77:61",
+        "vendor": "",
+        "context": {
+          "open_port_count": 1,
+          "exposure": "low",
+          "exposure_note": "1 open port(s). Minimal attack surface."
+        },
+        "risk_summary": {
+          "overall": "low",
+          "counts": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "total_ports": 1,
+          "color": "#1D9E75"
+        }
+      }
+    ],
+    "scan_summary": {
+      "elapsed": "6.88",
+      "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+      "hosts_up": "1",
+      "hosts_total": "1"
+    },
+    "raw_length": 9294,
+    "simulated": false
+  },
+  "versioned": {
+    "hosts": [
+      {
+        "ip": "10.83.113.181",
+        "hostnames": [],
+        "os": null,
+        "ports": [
+          {
+            "port": 53,
+            "protocol": "tcp",
+            "state": "open",
+            "service": "domain",
+            "product": "dnsmasq",
+            "version": "2.51",
+            "extra_info": "",
+            "confidence": 10,
+            "method": "probed",
+            "version_analysis": {
+              "status": "outdated",
+              "version_string": "dnsmasq 2.51",
+              "confidence": "medium",
+              "message": "dnsmasq 2.51 is not in the version database. Treat as potentially outdated.",
+              "age_years": null
+            },
+            "cves": [],
+            "context": {
+              "criticality": "high",
+              "criticality_reason": "DNS \u2014 can be abused for amplification or poisoning",
+              "exposure_type": "commonly_exposed",
+              "version_risk": "medium",
+              "total_open_ports": 1
+            },
+            "risk": {
+              "score": 3.0,
+              "level": "low",
+              "max_cvss": 0.0,
+              "cve_count": 0,
+              "reasons": [
+                "Service criticality is high",
+                "Version is outdated"
+              ],
+              "color": "#1D9E75"
+            }
+          }
+        ],
+        "mac": "DE:EA:78:22:77:61",
+        "vendor": "",
+        "context": {
+          "open_port_count": 1,
+          "exposure": "low",
+          "exposure_note": "1 open port(s). Minimal attack surface."
+        },
+        "risk_summary": {
+          "overall": "low",
+          "counts": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "total_ports": 1,
+          "color": "#1D9E75"
+        }
+      }
+    ],
+    "scan_summary": {
+      "elapsed": "6.88",
+      "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+      "hosts_up": "1",
+      "hosts_total": "1"
+    },
+    "raw_length": 9294,
+    "simulated": false
+  },
+  "cve_data": {
+    "hosts": [
+      {
+        "ip": "10.83.113.181",
+        "hostnames": [],
+        "os": null,
+        "ports": [
+          {
+            "port": 53,
+            "protocol": "tcp",
+            "state": "open",
+            "service": "domain",
+            "product": "dnsmasq",
+            "version": "2.51",
+            "extra_info": "",
+            "confidence": 10,
+            "method": "probed",
+            "version_analysis": {
+              "status": "outdated",
+              "version_string": "dnsmasq 2.51",
+              "confidence": "medium",
+              "message": "dnsmasq 2.51 is not in the version database. Treat as potentially outdated.",
+              "age_years": null
+            },
+            "cves": [],
+            "context": {
+              "criticality": "high",
+              "criticality_reason": "DNS \u2014 can be abused for amplification or poisoning",
+              "exposure_type": "commonly_exposed",
+              "version_risk": "medium",
+              "total_open_ports": 1
+            },
+            "risk": {
+              "score": 3.0,
+              "level": "low",
+              "max_cvss": 0.0,
+              "cve_count": 0,
+              "reasons": [
+                "Service criticality is high",
+                "Version is outdated"
+              ],
+              "color": "#1D9E75"
+            }
+          }
+        ],
+        "mac": "DE:EA:78:22:77:61",
+        "vendor": "",
+        "context": {
+          "open_port_count": 1,
+          "exposure": "low",
+          "exposure_note": "1 open port(s). Minimal attack surface."
+        },
+        "risk_summary": {
+          "overall": "low",
+          "counts": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "total_ports": 1,
+          "color": "#1D9E75"
+        }
+      }
+    ],
+    "scan_summary": {
+      "elapsed": "6.88",
+      "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+      "hosts_up": "1",
+      "hosts_total": "1"
+    },
+    "raw_length": 9294,
+    "simulated": false
+  },
+  "context": {
+    "hosts": [
+      {
+        "ip": "10.83.113.181",
+        "hostnames": [],
+        "os": null,
+        "ports": [
+          {
+            "port": 53,
+            "protocol": "tcp",
+            "state": "open",
+            "service": "domain",
+            "product": "dnsmasq",
+            "version": "2.51",
+            "extra_info": "",
+            "confidence": 10,
+            "method": "probed",
+            "version_analysis": {
+              "status": "outdated",
+              "version_string": "dnsmasq 2.51",
+              "confidence": "medium",
+              "message": "dnsmasq 2.51 is not in the version database. Treat as potentially outdated.",
+              "age_years": null
+            },
+            "cves": [],
+            "context": {
+              "criticality": "high",
+              "criticality_reason": "DNS \u2014 can be abused for amplification or poisoning",
+              "exposure_type": "commonly_exposed",
+              "version_risk": "medium",
+              "total_open_ports": 1
+            },
+            "risk": {
+              "score": 3.0,
+              "level": "low",
+              "max_cvss": 0.0,
+              "cve_count": 0,
+              "reasons": [
+                "Service criticality is high",
+                "Version is outdated"
+              ],
+              "color": "#1D9E75"
+            }
+          }
+        ],
+        "mac": "DE:EA:78:22:77:61",
+        "vendor": "",
+        "context": {
+          "open_port_count": 1,
+          "exposure": "low",
+          "exposure_note": "1 open port(s). Minimal attack surface."
+        },
+        "risk_summary": {
+          "overall": "low",
+          "counts": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "total_ports": 1,
+          "color": "#1D9E75"
+        }
+      }
+    ],
+    "scan_summary": {
+      "elapsed": "6.88",
+      "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+      "hosts_up": "1",
+      "hosts_total": "1"
+    },
+    "raw_length": 9294,
+    "simulated": false
+  },
+  "risk": {
+    "hosts": [
+      {
+        "ip": "10.83.113.181",
+        "hostnames": [],
+        "os": null,
+        "ports": [
+          {
+            "port": 53,
+            "protocol": "tcp",
+            "state": "open",
+            "service": "domain",
+            "product": "dnsmasq",
+            "version": "2.51",
+            "extra_info": "",
+            "confidence": 10,
+            "method": "probed",
+            "version_analysis": {
+              "status": "outdated",
+              "version_string": "dnsmasq 2.51",
+              "confidence": "medium",
+              "message": "dnsmasq 2.51 is not in the version database. Treat as potentially outdated.",
+              "age_years": null
+            },
+            "cves": [],
+            "context": {
+              "criticality": "high",
+              "criticality_reason": "DNS \u2014 can be abused for amplification or poisoning",
+              "exposure_type": "commonly_exposed",
+              "version_risk": "medium",
+              "total_open_ports": 1
+            },
+            "risk": {
+              "score": 3.0,
+              "level": "low",
+              "max_cvss": 0.0,
+              "cve_count": 0,
+              "reasons": [
+                "Service criticality is high",
+                "Version is outdated"
+              ],
+              "color": "#1D9E75"
+            }
+          }
+        ],
+        "mac": "DE:EA:78:22:77:61",
+        "vendor": "",
+        "context": {
+          "open_port_count": 1,
+          "exposure": "low",
+          "exposure_note": "1 open port(s). Minimal attack surface."
+        },
+        "risk_summary": {
+          "overall": "low",
+          "counts": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "total_ports": 1,
+          "color": "#1D9E75"
+        }
+      }
+    ],
+    "scan_summary": {
+      "elapsed": "6.88",
+      "summary": "Nmap done at Wed Apr 29 09:35:39 2026; 1 IP address (1 host up) scanned in 6.88 seconds",
+      "hosts_up": "1",
+      "hosts_total": "1"
+    },
+    "raw_length": 9294,
+    "simulated": false
+  },
+  "recommendation": {
+    "title": "Deep Version Detection",
+    "reason": "Outdated versions detected. A deep version scan will precisely fingerprint service versions for accurate CVE matching.",
+    "scan_type": "version_deep",
+    "priority": 2,
+    "command_description": "Aggressively fingerprints exact service versions.",
+    "alternatives": [
+      {
+        "title": "UDP Top-100 Scan",
+        "reason": "UDP ports not yet scanned. Services like DNS (53), SNMP (161), and NTP (123) run over UDP and are commonly overlooked.",
+        "scan_type": "udp_scan",
+        "priority": 3,
+        "command_description": "Scans the top 100 UDP ports for common services."
+      },
+      {
+        "title": "Script Enumeration",
+        "reason": "Default NSE scripts can detect misconfigurations, additional banners, and service-specific vulnerabilities.",
+        "scan_type": "enum_scripts",
+        "priority": 4,
+        "command_description": "Runs default NSE scripts for deeper service enumeration."
+      }
+    ]
+  },
+  "explanation": {
+    "summary": "Scan complete. Found 1 live host(s) with 1 open port(s). No critical or high-severity findings in this scan.",
+    "findings": [
+      {
+        "port": 53,
+        "service": "domain",
+        "version": "dnsmasq 2.51",
+        "risk_level": "low",
+        "what_was_found": "Port 53/tcp is open running DOMAIN (dnsmasq 2.51)",
+        "why_it_matters": "DNS \u2014 can be abused for amplification or poisoning",
+        "version_status": "dnsmasq 2.51 is outdated. Upgrade recommended.",
+        "cve_count": 0,
+        "top_cves": [],
+        "risk_explanation": "Risk classified as LOW (score 3.0/10). Service criticality is high Version is outdated",
+        "guidance": [
+          "Upgrade DOMAIN to the latest stable version immediately.",
+          "Restrict DNS zone transfers to authorised secondary servers only.",
+          "Enable DNSSEC for DNS integrity.",
+          "Rate-limit DNS queries to mitigate amplification attacks."
+        ]
+      }
+    ],
+    "defensive_guidance": [
+      "Upgrade DOMAIN to the latest stable version immediately.",
+      "Restrict DNS zone transfers to authorised secondary servers only.",
+      "Enable DNSSEC for DNS integrity.",
+      "Rate-limit DNS queries to mitigate amplification attacks."
+    ],
+    "next_step": "Outdated versions detected. A deep version scan will precisely fingerprint service versions for accurate CVE matching.",
+    "next_scan": "Deep Version Detection"
+  },
+  "ai_analysis": {
+    "findings": [
+      {
+        "port": 53,
+        "service": "domain",
+        "version": "dnsmasq 2.51",
+        "exposure": "commonly_exposed"
+      }
+    ],
+    "version_status": [
+      {
+        "service": "domain",
+        "version": "dnsmasq 2.51",
+        "status": "unknown",
+        "confidence": "low",
+        "note": "Could not determine version status from pattern matching"
+      }
+    ],
+    "cve_insight": [
+      {
+        "service": "domain",
+        "cve_id": "unknown",
+        "severity": "unknown",
+        "description": "Run version_deep scan for accurate CVE matching",
+        "confidence": "low"
+      }
+    ],
+    "risk_analysis": [
+      {
+        "service": "domain",
+        "port": 53,
+        "risk_level": "low",
+        "score": 2.0,
+        "reason": "Non-standard service"
+      }
+    ],
+    "recommendations": [
+      {
+        "service": "domain",
+        "action": "Review if port 53 needs to be open. Apply latest patches.",
+        "priority": "low"
+      }
+    ],
+    "next_scan": {
+      "type": "udp_scan",
+      "reason": "TCP scan complete. UDP services like DNS (53), SNMP (161) may still be exposed.",
+      "command_hint": "nmap -sU --top-ports 100 -T3 (add target, requires root)"
+    },
+    "notes": [
+      "Analysis generated by rule-based fallback engine (AI unavailable).",
+      "Set ANTHROPIC_API_KEY environment variable to enable AI analysis.",
+      "Run a version_deep scan for higher-confidence CVE matching."
+    ],
+    "overall_risk": "low",
+    "summary": "Scan found 1 open service(s) on 10.83.113.181. 0 critical risk(s) identified. Review recommendations and apply patches.",
+    "engine": "rule-based-fallback",
+    "fallback_reason": "ANTHROPIC_API_KEY not set"
+  },
+  "charts": {
+    "risk_distribution": {
+      "type": "doughnut",
+      "title": "Risk Distribution",
+      "labels": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "data": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "colors": [
+        "#E24B4A",
+        "#EF9F27",
+        "#378ADD",
+        "#1D9E75"
+      ]
+    },
+    "service_distribution": {
+      "type": "bar",
+      "title": "Services Discovered",
+      "labels": [
+        "DOMAIN"
+      ],
+      "data": [
+        1
+      ],
+      "colors": [
+        "#1f6feb"
+      ]
+    },
+    "severity_breakdown": {
+      "type": "bar",
+      "title": "CVE Severity Breakdown",
+      "labels": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low",
+        "Unknown"
+      ],
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "colors": [
+        "#E24B4A",
+        "#EF9F27",
+        "#378ADD",
+        "#1D9E75",
+        "#8b949e"
+      ]
+    },
+    "port_exposure": {
+      "type": "pie",
+      "title": "Port Exposure Type",
+      "labels": [
+        "Commonly Exposed",
+        "Well-Known",
+        "High Port"
+      ],
+      "data": [
+        1,
+        0,
+        0
+      ],
+      "colors": [
+        "#E24B4A",
+        "#EF9F27",
+        "#378ADD"
+      ]
+    },
+    "cve_summary": {
+      "type": "bar",
+      "title": "CVEs per Service",
+      "labels": [],
+      "data": [],
+      "colors": [],
+      "total_cves": 0
+    },
+    "risk_gauge": {
+      "type": "gauge",
+      "title": "Overall Risk Score",
+      "value": 30,
+      "label": "Low",
+      "color": "#1D9E75"
+    }
+  },
+  "timestamp": "2026-04-29 09:35:39"
+}
